@@ -5,7 +5,6 @@ import interfaces.AbstractQueue;
 import java.util.Iterator;
 
 public class Queue<E> implements AbstractQueue<E> {
-
     @Override
     public void offer(E element) {
 
