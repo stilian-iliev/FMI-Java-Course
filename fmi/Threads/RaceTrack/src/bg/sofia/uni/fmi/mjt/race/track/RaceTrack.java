@@ -2,28 +2,43 @@ package bg.sofia.uni.fmi.mjt.race.track;
 
 import bg.sofia.uni.fmi.mjt.race.track.pit.Pit;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class RaceTrack implements Track{
     private final Pit pit;
+    private final List<Integer> finishedCarsIds;
 
     public RaceTrack(int pitTeams) {
         this.pit = new Pit(pitTeams);
+        this.finishedCarsIds = new ArrayList<>();
     }
 
     @Override
     public void enterPit(Car car) {
-        pit.submitCar(car);
+        if (car == null) {
+            throw new IllegalArgumentException("Invalid car arg");
+        }
+
+        if (car.getNPitStops() == 0) {
+            synchronized (finishedCarsIds) {
+                finishedCarsIds.add(car.getCarId());
+            }
+        } else {
+            pit.submitCar(car);
+        }
+
     }
 
     @Override
     public int getNumberOfFinishedCars() {
-        return 0;
+        return finishedCarsIds.size();
     }
 
     @Override
     public List<Integer> getFinishedCarsIds() {
-        return null;
+        return Collections.unmodifiableList(finishedCarsIds);
     }
 
     @Override

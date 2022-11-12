@@ -2,29 +2,40 @@ package bg.sofia.uni.fmi.mjt.race.track.pit;
 
 import bg.sofia.uni.fmi.mjt.race.track.Car;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Pit {
-    private Set<PitTeam> teams;
+    private List<PitTeam> teams;
+    private final AtomicInteger stoppedCount;
+    private final Queue<Car> pitQueue;
     public Pit(int nPitTeams) {
-        throw new UnsupportedOperationException("Method not yet implemented");
+        this.teams = new ArrayList<>();
+        this.stoppedCount = new AtomicInteger();
+        this.pitQueue = new ArrayDeque<>();
+
+        for (int i = 0; i < nPitTeams; i++) {
+            PitTeam team = new PitTeam(i, this);
+            teams.add(team);
+            team.start();
+        }
     }
 
     public void submitCar(Car car) {
-        throw new UnsupportedOperationException("Method not yet implemented");
+        stoppedCount.incrementAndGet();
+
     }
 
     public Car getCar() {
-        throw new UnsupportedOperationException("Method not yet implemented");
+        return pitQueue.poll();
     }
 
     public int getPitStopsCount() {
-        throw new UnsupportedOperationException("Method not yet implemented");
+        return stoppedCount.get();
     }
 
     public List<PitTeam> getPitTeams() {
-        throw new UnsupportedOperationException("Method not yet implemented");
+        return Collections.unmodifiableList(teams);
     }
 
     public void finishRace() {

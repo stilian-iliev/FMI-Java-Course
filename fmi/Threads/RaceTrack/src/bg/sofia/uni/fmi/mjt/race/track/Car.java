@@ -2,7 +2,7 @@ package bg.sofia.uni.fmi.mjt.race.track;
 
 public class Car extends Thread{
     private final int id;
-    private final int pitStops;
+    private int pitStops;
     private final Track track;
 
     public Car(int id, int nPitStops, Track track) {
@@ -13,7 +13,18 @@ public class Car extends Thread{
 
     @Override
     public void run() {
-        throw new UnsupportedOperationException("Method not yet implemented");
+        while (pitStops != 0) {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            track.enterPit(this);
+            pitStops--;
+            System.out.printf("Car %s enters the pit.%n", id);
+        }
+        System.out.printf("Car %s finished the race.%n", id);
+
     }
 
     public int getCarId() {
