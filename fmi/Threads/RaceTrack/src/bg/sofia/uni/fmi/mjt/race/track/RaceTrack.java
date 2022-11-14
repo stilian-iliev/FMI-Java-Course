@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class RaceTrack implements Track{
+public class RaceTrack implements Track {
     private final Pit pit;
     private final List<Integer> finishedCarsIds;
 
@@ -22,9 +22,9 @@ public class RaceTrack implements Track{
         }
 
         if (car.getNPitStops() == 0) {
-            synchronized (finishedCarsIds) {
-                finishedCarsIds.add(car.getCarId());
-            }
+            finishedCarsIds.add(car.getCarId());
+            System.out.println("Car " + car.getCarId() + " finished.");
+
         } else {
             pit.submitCar(car);
         }
