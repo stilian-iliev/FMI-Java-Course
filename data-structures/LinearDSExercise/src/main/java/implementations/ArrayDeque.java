@@ -3,6 +3,7 @@ package implementations;
 import interfaces.Deque;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class ArrayDeque<E> implements Deque<E> {
     private final int INITIAL_CAPACITY = 3;
@@ -68,12 +69,38 @@ public class ArrayDeque<E> implements Deque<E> {
 
     @Override
     public void insert(int index, E element) {
+        ensureIndexInBounds(index);
+        if (size() == capacity()) this.elements = grow();
 
+        int realIndex = this.head + index;
+
+        if (realIndex - this.head < this.tail - realIndex) {
+            outwardShiftLeft(realIndex);
+            this.head--;
+        } else {
+            outwardShiftRight(realIndex);
+            this.tail++;
+        }
+        this.size++;
+        this.elements[realIndex] = element;
+    }
+
+    private void outwardShiftLeft(int realIndex) {
+        for (int i = this.head - 1; i < realIndex; i++) {
+            this.elements[i] = this.elements[i + 1];
+        }
+    }
+
+    private void outwardShiftRight(int realIndex) {
+        for (int i = this.tail; i >= realIndex; i--) {
+            this.elements[i + 1] = this.elements[i];
+        }
     }
 
     @Override
     public void set(int index, E element) {
-
+        ensureIndexInBounds(index);
+        this.elements[this.head + index] = element;
     }
 
     @Override
@@ -83,12 +110,12 @@ public class ArrayDeque<E> implements Deque<E> {
 
     @Override
     public E poll() {
-        return null;
+        return removeFirst();
     }
 
     @Override
     public E pop() {
-        return null;
+        return removeFirst();
     }
 
     @Override
@@ -99,27 +126,70 @@ public class ArrayDeque<E> implements Deque<E> {
 
     @SuppressWarnings("unchecked")
     private E getAtRealIndex(int index) {
-        return (E)this.elements[index];
+        return (E) this.elements[index];
     }
 
     private void ensureIndexInBounds(int index) {
-        if (index < 0 || index > size()) throw new IndexOutOfBoundsException(String.format("Index %s out of bounds for length %s.",index, size()));
+        if (index < 0 || index > size())
+            throw new IndexOutOfBoundsException(String.format("Index %s out of bounds for length %s.", index, size()));
     }
 
     @Override
     public E get(Object object) {
-        return null;
+        E element = null;
+        for (E e : this) {
+            if (e.equals(object)){
+                element = e;
+                break;
+            }
+        }
+        return element;
     }
 
     @Override
     public E remove(int index) {
-        return null;
+        ensureIndexInBounds(index);
+        int realIndex = this.head + index;
+        E element = get(index);
+
+        if (realIndex - this.head < this.tail - realIndex) {
+            inwardShiftRight(realIndex);
+            removeFirst();
+            removeFirst();
+            this.head++;
+        } else {
+            inwardShiftLeft(realIndex);
+            removeLast();
+            this.tail--;
+        }
+
+        return element;
+    }
+
+    private void inwardShiftLeft(int realIndex) {
+        for (int i = realIndex; i <= this.tail; i++) {
+            this.elements[i] = this.elements[i + 1];
+        }
+    }
+
+    private void inwardShiftRight(int realIndex) {
+        for (int i = realIndex; i > this.head; i--) {
+            this.elements[i] = this.elements[i - 1];
+        }
     }
 
     @Override
     public E remove(Object object) {
-        return null;
+        int index = -1;
+        for (int i = 0; i < size(); i++) {
+            if (get(i).equals(object)){
+                index = i;
+                break;
+            }
+        }
+        return remove(index);
     }
+
 
     @Override
     public E removeFirst() {
@@ -155,21 +225,28 @@ public class ArrayDeque<E> implements Deque<E> {
 
     @Override
     public void trimToSize() {
+        Object[] newElements = new Object[size()];
 
+        for (int i = 0; i < newElements.length; i++) {
+            newElements[i] = get(i);
+        }
+        this.elements = newElements;
     }
 
     @Override
     public boolean isEmpty() {
         return this.size == 0;
     }
-//2:56
+
+    //2:56
     @Override
     public Iterator<E> iterator() {
         return new Iterator<E>() {
             private int i = 0;
+
             @Override
             public boolean hasNext() {
-                return i < size() ;
+                return i < size();
             }
 
             @Override

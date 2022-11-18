@@ -17,18 +17,33 @@ public class ArrayDequeTest extends TestCase {
 //        ad.addLast(5);
 //        ad.addLast(6);
 
+
         ad.addFirst(0);
-        ad.addFirst(1);
-        ad.addFirst(2);
-        ad.addFirst(3);
-        ad.addFirst(4);
-        ad.addFirst(5);
+        ad.addFirst(-1);
+        ad.addLast(1);
+        ad.insert(2, 9);
+        ad.addLast(3);
 
-        ad.removeLast();
-        ad.removeLast();
-        ad.removeLast();
+//        ad.forEach(System.out::println);
 
-        ad.addLast(2);
+
+
+    }
+
+    @Test
+    public void testAD2() {
+        ArrayDeque<String> ad = new ArrayDeque<>();
+
+
+        ad.addFirst("0");
+        ad.addFirst("-1");
+        ad.addFirst("-2");
+        ad.addLast("1");
+        ad.addLast("2");
+        ad.remove("0");
+
+//        ad.forEach(System.out::println);
+
 
 
     }
