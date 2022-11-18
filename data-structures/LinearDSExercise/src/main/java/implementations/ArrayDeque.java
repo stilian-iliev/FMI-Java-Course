@@ -5,29 +5,65 @@ import interfaces.Deque;
 import java.util.Iterator;
 
 public class ArrayDeque<E> implements Deque<E> {
-    @Override
-    public void add(E Element) {
+    private final int INITIAL_CAPACITY = 3;
+    private Object[] elements;
+    private int size;
+    private int head;
+    private int tail;
 
+    public ArrayDeque() {
+        this.elements = new Object[INITIAL_CAPACITY];
+        this.head = this.tail = INITIAL_CAPACITY / 2;
+    }
+
+    @Override
+    public void add(E element) {
+        addLast(element);
     }
 
     @Override
     public void offer(E element) {
-
+        addFirst(element);
     }
 
     @Override
     public void addFirst(E element) {
-
+        if (head == 0) {
+            this.elements = grow();
+        }
+        if (size() == 0)
+            this.head++;
+        this.elements[--this.head] = element;
+        this.size++;
     }
 
     @Override
     public void addLast(E element) {
+        if (tail == capacity() - 1) {
+            this.elements = grow();
+        }
+        if (size() == 0)
+            this.tail--;
+        this.elements[++this.tail] = element;
+        this.size++;
+    }
 
+    private Object[] grow() {
+        Object[] newElements = new Object[capacity() * 2 + 1];
+        int newHead = capacity() - (size() / 2);
+
+        int index = newHead;
+        for (Object element : this) {
+            newElements[index++] = element;
+        }
+        this.head = newHead;
+        this.tail = newHead + size() - 1;
+        return newElements;
     }
 
     @Override
     public void push(E element) {
-
+        addFirst(element);
     }
 
     @Override
@@ -42,7 +78,7 @@ public class ArrayDeque<E> implements Deque<E> {
 
     @Override
     public E peek() {
-        return null;
+        return get(0);
     }
 
     @Override
@@ -57,7 +93,17 @@ public class ArrayDeque<E> implements Deque<E> {
 
     @Override
     public E get(int index) {
-        return null;
+        ensureIndexInBounds(index);
+        return getAtRealIndex(this.head + index);
+    }
+
+    @SuppressWarnings("unchecked")
+    private E getAtRealIndex(int index) {
+        return (E)this.elements[index];
+    }
+
+    private void ensureIndexInBounds(int index) {
+        if (index < 0 || index > size()) throw new IndexOutOfBoundsException(String.format("Index %s out of bounds for length %s.",index, size()));
     }
 
     @Override
@@ -77,22 +123,34 @@ public class ArrayDeque<E> implements Deque<E> {
 
     @Override
     public E removeFirst() {
-        return null;
+        ensureNotEmpty();
+        E element = get(0);
+        this.elements[head++] = null;
+        return element;
     }
 
     @Override
     public E removeLast() {
-        return null;
+        ensureNotEmpty();
+        E element = get(size());
+        this.elements[tail--] = null;
+        return element;
+    }
+
+    private void ensureNotEmpty() {
+        if (isEmpty()) {
+            throw new IndexOutOfBoundsException();
+        }
     }
 
     @Override
     public int size() {
-        return 0;
+        return this.size;
     }
 
     @Override
     public int capacity() {
-        return 0;
+        return this.elements.length;
     }
 
     @Override
@@ -102,11 +160,22 @@ public class ArrayDeque<E> implements Deque<E> {
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return this.size == 0;
     }
-
+//2:56
     @Override
     public Iterator<E> iterator() {
-        return null;
+        return new Iterator<E>() {
+            private int i = 0;
+            @Override
+            public boolean hasNext() {
+                return i < size() ;
+            }
+
+            @Override
+            public E next() {
+                return get(i++);
+            }
+        };
     }
 }
