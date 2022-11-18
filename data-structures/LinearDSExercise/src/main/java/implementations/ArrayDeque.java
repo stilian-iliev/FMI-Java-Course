@@ -24,7 +24,7 @@ public class ArrayDeque<E> implements Deque<E> {
 
     @Override
     public void offer(E element) {
-        addFirst(element);
+        addLast(element);
     }
 
     @Override
@@ -74,6 +74,13 @@ public class ArrayDeque<E> implements Deque<E> {
 
         int realIndex = this.head + index;
 
+        if (index == 0){
+            addFirst(element);
+            return;
+        } else if (index == size() - 1){
+            addLast(element);
+            return;
+        }
         if (realIndex - this.head < this.tail - realIndex) {
             outwardShiftLeft(realIndex);
             this.head--;
@@ -152,9 +159,15 @@ public class ArrayDeque<E> implements Deque<E> {
         int realIndex = this.head + index;
         E element = get(index);
 
+        if (index == 0) {
+            removeFirst();
+            return element;
+        } else if (index == size() - 1) {
+            removeLast();
+            return element;
+        }
         if (realIndex - this.head < this.tail - realIndex) {
             inwardShiftRight(realIndex);
-            removeFirst();
             removeFirst();
             this.head++;
         } else {
@@ -187,6 +200,7 @@ public class ArrayDeque<E> implements Deque<E> {
                 break;
             }
         }
+        if (index == -1) return null;
         return remove(index);
     }
 
@@ -196,14 +210,16 @@ public class ArrayDeque<E> implements Deque<E> {
         ensureNotEmpty();
         E element = get(0);
         this.elements[head++] = null;
+        size--;
         return element;
     }
 
     @Override
     public E removeLast() {
         ensureNotEmpty();
-        E element = get(size());
+        E element = get(size()-1);
         this.elements[tail--] = null;
+        size--;
         return element;
     }
 
